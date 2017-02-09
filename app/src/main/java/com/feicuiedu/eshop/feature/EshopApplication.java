@@ -1,4 +1,4 @@
-package com.feicuiedu.eshop;
+package com.feicuiedu.eshop.feature;
 
 import android.app.Application;
 

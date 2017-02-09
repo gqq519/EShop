@@ -31,4 +31,18 @@ dependencies {
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
     testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+
+    // 指示器
+    compile 'me.relex:circleindicator:1.2.2@aar'
+
+    // 刷新加载
+    compile 'in.srain.cube:ultra-ptr:1.0.11'
+
+    // 底部切换条
+    compile 'com.roughike:bottom-bar:2.0.2'
+
+    // butterknife
+    compile 'com.jakewharton:butterknife:8.5.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+
 }
