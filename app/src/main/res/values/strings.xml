@@ -1,3 +1,50 @@
 <resources>
+
+    <!-- 字符串命名规范 -->
+    <!--
+        字符串的名称应该以一个前缀开头, 此前缀表明它们属于哪一个模块.
+
+        如果一个字符串不属于任何模块，那么应该使用如下前缀:
+            * error_    错误信息
+            * msg_      常规通知信息
+            * title_    标题, 例如dialog标题
+            * action_   操作, 例如"保存"或"取消"
+    -->
+
     <string name="app_name">EShop</string>
+
+    <string name="main_home">首页</string>
+    <string name="main_category">分类</string>
+    <string name="main_shopping_cart">购物车</string>
+    <string name="main_mine">我的</string>
+
+    <string name="home_promote_goods">促销单品</string>
+    <string name="home_title">首&#160;&#160;页</string>
+
+    <string name="category_title">分&#160;&#160;类</string>
+
+    <string name="search_hint">请输入要搜索的商品</string>
+    <string name="search_order_is_hot">热销</string>
+    <string name="search_order_price">价格</string>
+
+    <string name="goods_title_info">商品</string>
+    <string name="goods_title_details">详情</string>
+    <string name="goods_title_comments">评价</string>
+    <string name="goods_buy_it_now">立即购买</string>
+    <string name="goods_add_to_shopping_cart">加入购物车</string>
+    <string name="goods_inventory">库存</string>
+    <string name="goods_msg_must_choose_number">请选择数量</string>
+    <string name="goods_comments">商品评价</string>
+    <string name="goods_details">商品详情</string>
+
+    <string name="cart_number">数量</string>
+
+    <string name="action_search">搜索</string>
+    <string name="action_share">分享</string>
+    <string name="action_confirm">确认</string>
+
+    <string name="msg_load_more_complete">没有更多了…</string>
+
+    <string name="error_network">网络错误, 请检查网络设置</string>
+
 </resources>
