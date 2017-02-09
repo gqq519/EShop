@@ -57,7 +57,7 @@ public class SplashActivity extends AppCompatActivity implements Animator.Animat
     public void onAnimationEnd(Animator animator) {
         Intent intent = new Intent(this,EShopMainActivity.class);
         startActivity(intent);
-
+        finish();
         // 设置转场动画
         overridePendingTransition(R.anim.push_right_in,R.anim.push_right_out);
     }
