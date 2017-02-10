@@ -1,5 +1,6 @@
 package com.feicuiedu.eshop.feature;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.feicuiedu.eshop.R;
 import com.feicuiedu.eshop.base.TestFragment;
+import com.feicuiedu.eshop.feature.category.CategoryFragment;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 
@@ -37,11 +39,16 @@ public class EShopMainActivity extends AppCompatActivity implements OnTabSelectL
     BottomBar mBottomBar;
 
     private TestFragment mHomeFragment;
-    private TestFragment mCategroyFragment;
+    private CategoryFragment mCategroyFragment;
     private TestFragment mCartFragment;
     private TestFragment mMineFragment;
 
     private Fragment mCurrentFragment;
+
+    public AppCompatActivity getActivity(){
+
+        return this;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +80,7 @@ public class EShopMainActivity extends AppCompatActivity implements OnTabSelectL
                 break;
             case R.id.tab_category:
                 if (mCategroyFragment == null) {
-                    mCategroyFragment = TestFragment.getInstance("分类");
+                    mCategroyFragment = new CategoryFragment();
                 }
                 // 切换
                 switchFragment(mCategroyFragment);
@@ -112,19 +119,21 @@ public class EShopMainActivity extends AppCompatActivity implements OnTabSelectL
         }else {
             // 否则直接添加
             String tag;
-            tag = ((TestFragment)target).getArgumentText();
-            transaction.add(R.id.layout_container,target,tag);
+
+//            前期页面搭建不需要判断
+//            tag = ((TestFragment)target).getArgumentText();
+//            transaction.add(R.id.layout_container,target,tag);
 
 //            后期更新不全是TestFragment时，需要判断
-//            if (target instanceof TestFragment) {
-//                tag = ((TestFragment) target).getArgumentText();
-//            } else {
-//                tag = target.getClass().getName();
-//            }
+            if (target instanceof TestFragment) {
+                tag = ((TestFragment) target).getArgumentText();
+            } else {
+                tag = target.getClass().getName();
+            }
+            transaction.add(R.id.layout_container,target,tag);
         }
 
         transaction.commit();
-
         mCurrentFragment=target;
     }
 
@@ -132,7 +141,7 @@ public class EShopMainActivity extends AppCompatActivity implements OnTabSelectL
     private void retrieveFragment() {
         FragmentManager manager = getSupportFragmentManager();
         mHomeFragment = (TestFragment) manager.findFragmentByTag("首页");
-        mCategroyFragment = (TestFragment) manager.findFragmentByTag("分类");
+        mCategroyFragment = (CategoryFragment) manager.findFragmentByTag(CategoryFragment.class.getName());
         mCartFragment = (TestFragment) manager.findFragmentByTag("购物车");
         mMineFragment = (TestFragment) manager.findFragmentByTag("我的");
     }
