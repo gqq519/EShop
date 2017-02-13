@@ -7,26 +7,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
 import com.feicuiedu.eshop.R;
+import com.feicuiedu.eshop.base.BaseActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SplashActivity extends AppCompatActivity implements Animator.AnimatorListener {
+public class SplashActivity extends BaseActivity implements Animator.AnimatorListener {
 
     @BindView(R.id.image_splash)
     ImageView mIvSplash;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
-        ButterKnife.bind(this);
-
-        // 实现页面动画效果
-        initView();
+    protected int getContentViewLayout() {
+        return R.layout.activity_splash;
     }
 
-    private void initView() {
+    @Override
+    protected void initView() {
 
         // 首先设置透明度
         mIvSplash.setAlpha(0.3f);
@@ -72,10 +69,5 @@ public class SplashActivity extends AppCompatActivity implements Animator.Animat
     @Override
     public void onAnimationRepeat(Animator animator) {
 
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 }

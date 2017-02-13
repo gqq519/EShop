@@ -6,7 +6,11 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -14,6 +18,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.feicuiedu.eshop.R;
+import com.feicuiedu.eshop.base.BaseFragment;
+import com.feicuiedu.eshop.base.utils.LogUtils;
 import com.feicuiedu.eshop.feature.EShopMainActivity;
 import com.feicuiedu.eshop.network.EShopClient;
 import com.feicuiedu.eshop.network.entity.CategoryPrimary;
@@ -31,7 +37,7 @@ import butterknife.OnItemClick;
 
 // 商品分类页面
 
-public class CategoryFragment extends Fragment {
+public class CategoryFragment extends BaseFragment {
 
     @BindView(R.id.standard_toolbar_title)
     TextView mToolbarTitle;
@@ -47,24 +53,15 @@ public class CategoryFragment extends Fragment {
     private ChildrenAdapter mChildrenAdapter;
     private Handler mHandler = new Handler();
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_category, container, false);
-        ButterKnife.bind(this, view);
-        return view;
+    protected int getContentViewLayout() {
+        return R.layout.fragment_category;
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        initView();
-    }
-
-    private void initView() {
+    protected void initView() {
 
         // toolbar
-//        EShopMainActivity.getActivity().setSupportActionBar(mToolbar);
         mToolbarTitle.setText(R.string.category_title);
 
         // 设置适配器：创建及实现
@@ -107,14 +104,14 @@ public class CategoryFragment extends Fragment {
 
     // 更新分类信息
     private void updateCategory() {
-        mCategoryAdapter.addAll(mData);
+        mCategoryAdapter.reset(mData);
         chooseCategory(0);
     }
 
     // 切换一级展示的二级分类的内容
     private void chooseCategory(int position) {
         mListCategory.setItemChecked(position,true);
-        mChildrenAdapter.addAll(mData.get(position).getChildren());
+        mChildrenAdapter.reset(mData.get(position).getChildren());
     }
 
     @OnItemClick(R.id.list_category)

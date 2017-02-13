@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
 import com.feicuiedu.eshop.R;
+import com.feicuiedu.eshop.base.BaseActivity;
 import com.feicuiedu.eshop.base.TestFragment;
 import com.feicuiedu.eshop.feature.category.CategoryFragment;
 import com.roughike.bottombar.BottomBar;
@@ -33,7 +34,7 @@ import butterknife.ButterKnife;
  *  3.6 返回键处理
  */
 
-public class EShopMainActivity extends AppCompatActivity implements OnTabSelectListener {
+public class EShopMainActivity extends BaseActivity implements OnTabSelectListener {
 
     @BindView(R.id.bottom_bar)
     BottomBar mBottomBar;
@@ -45,22 +46,14 @@ public class EShopMainActivity extends AppCompatActivity implements OnTabSelectL
 
     private Fragment mCurrentFragment;
 
-    public AppCompatActivity getActivity(){
-
-        return this;
+    // 基类重写的方法
+    @Override
+    protected int getContentViewLayout() {
+        return R.layout.activity_eshop_main;
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_eshop_main);
-        ButterKnife.bind(this);
-
-        // 初始化View
-        initView();
-    }
-
-    private void initView() {
+    protected void initView() {
         // 找回FragmentManager中存储的Fragment
         retrieveFragment();
         // 设置切换监听
