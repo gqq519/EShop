@@ -45,7 +45,7 @@ public class EShopClient {
 
 
     // 分类：获取商品分类的数据
-    public CategoryRsp getCategory() {
+    public CategoryRsp getCategory() throws IOException {
 
         CategoryRsp categoryRsp = new CategoryRsp();
 
@@ -55,21 +55,20 @@ public class EShopClient {
                 .url(BASE_URL + "/category")
                 .build();
 
-        try {
-            // 拿到响应解析
-            Response response = mOkHttpClient.newCall(request).execute();
-            if (response != null) {
-                ResponseBody body = response.body();
-                categoryRsp = new Gson().fromJson(body.string(), CategoryRsp.class);
-            }
-            return categoryRsp;
-        } catch (IOException e) {
-            throw new RuntimeException();
+        // 拿到响应解析
+        Response response = mOkHttpClient.newCall(request).execute();
+
+        if (!response.isSuccessful()) {
+            throw new IOException("Response code is" + response.code());
         }
+
+        ResponseBody body = response.body();
+        categoryRsp = new Gson().fromJson(body.string(), CategoryRsp.class);
+        return categoryRsp;
     }
 
     // 首页：轮播图
-    public HomeBannerRsp getHomeBannerRsp() {
+    public HomeBannerRsp getHomeBannerRsp() throws IOException {
         HomeBannerRsp homeBannerRsp = new HomeBannerRsp();
 
         Request request = new Request.Builder()
@@ -77,33 +76,33 @@ public class EShopClient {
                 .url(BASE_URL + "/home/data")
                 .build();
 
-        try {
-            Response response = mOkHttpClient.newCall(request).execute();
-            if (response != null) {
-                String json = response.body().string();
-                homeBannerRsp = new Gson().fromJson(json, HomeBannerRsp.class);
-            }
-            return homeBannerRsp;
-        } catch (IOException e) {
-            throw new RuntimeException();
+        Response response = mOkHttpClient.newCall(request).execute();
+
+        if (!response.isSuccessful()) {
+            throw new IOException("Response code is" + response.code());
         }
+
+        String json = response.body().string();
+        homeBannerRsp = new Gson().fromJson(json, HomeBannerRsp.class);
+
+        return homeBannerRsp;
     }
 
     // 首页的分类及推荐商品
-    public HomeCategoryRsp getHomeCategoryRsp() {
+    public HomeCategoryRsp getHomeCategoryRsp() throws IOException {
         HomeCategoryRsp homeCategoryRsp = new HomeCategoryRsp();
         Request request = new Request.Builder()
                 .get()
                 .url(BASE_URL + "/home/category")
                 .build();
 
-        try {
             Response response = mOkHttpClient.newCall(request).execute();
+
+            if (!response.isSuccessful()) {
+                throw new IOException("Response code is"+response.code());
+            }
             String json = response.body().string();
             homeCategoryRsp = new Gson().fromJson(json, HomeCategoryRsp.class);
             return homeCategoryRsp;
-        } catch (IOException e) {
-            throw new RuntimeException();
-        }
     }
 }

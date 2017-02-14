@@ -4,7 +4,7 @@
               android:layout_height="wrap_content"
               android:orientation="vertical">
 
-    <com.feicuiedu.eshop.base.widgets.banner.BannerLayout
+    <com.feicuiedu.eshop.base.widgets.BannerLayout
         android:id="@+id/layout_banner"
         android:layout_width="match_parent"
         android:layout_height="@dimen/size_180"/>

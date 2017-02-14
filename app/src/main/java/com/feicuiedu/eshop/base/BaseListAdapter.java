@@ -90,7 +90,7 @@ public abstract class BaseListAdapter<T, V extends BaseListAdapter.ViewHolder> e
             this.itemView = itemView;
         }
 
-        public abstract void bind(int position);
+        protected abstract void bind(int position);
 
         // 上下文，引出：如果某些需要上下文的事件在适配里面写(itemView的某一控件的点击跳转事件等)，所以在对外提供一个上下文
         public Context getContext(){

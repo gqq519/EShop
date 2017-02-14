@@ -26,4 +26,16 @@ public class Banner {
     public String getUrl() {
         return mUrl;
     }
+
+    public void setPicture(Picture picture) {
+        mPicture = picture;
+    }
+
+    public void setDesc(String desc) {
+        mDesc = desc;
+    }
+
+    public void setUrl(String url) {
+        mUrl = url;
+    }
 }

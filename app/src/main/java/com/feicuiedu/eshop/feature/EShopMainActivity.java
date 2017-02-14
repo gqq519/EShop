@@ -12,6 +12,7 @@ import com.feicuiedu.eshop.R;
 import com.feicuiedu.eshop.base.BaseActivity;
 import com.feicuiedu.eshop.base.TestFragment;
 import com.feicuiedu.eshop.feature.category.CategoryFragment;
+import com.feicuiedu.eshop.feature.home.HomeFragment;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 
@@ -39,7 +40,7 @@ public class EShopMainActivity extends BaseActivity implements OnTabSelectListen
     @BindView(R.id.bottom_bar)
     BottomBar mBottomBar;
 
-    private TestFragment mHomeFragment;
+    private HomeFragment mHomeFragment;
     private CategoryFragment mCategroyFragment;
     private TestFragment mCartFragment;
     private TestFragment mMineFragment;
@@ -66,7 +67,7 @@ public class EShopMainActivity extends BaseActivity implements OnTabSelectListen
         switch (tabId) {
             case R.id.tab_home:
                 if (mHomeFragment == null) {
-                    mHomeFragment = TestFragment.getInstance("首页");
+                    mHomeFragment = new HomeFragment();
                 }
                 // 切换
                 switchFragment(mHomeFragment);
@@ -133,7 +134,7 @@ public class EShopMainActivity extends BaseActivity implements OnTabSelectListen
     // 找回FragmentManager中存储的Fragment
     private void retrieveFragment() {
         FragmentManager manager = getSupportFragmentManager();
-        mHomeFragment = (TestFragment) manager.findFragmentByTag("首页");
+        mHomeFragment = (HomeFragment) manager.findFragmentByTag(HomeFragment.class.getName());
         mCategroyFragment = (CategoryFragment) manager.findFragmentByTag(CategoryFragment.class.getName());
         mCartFragment = (TestFragment) manager.findFragmentByTag("购物车");
         mMineFragment = (TestFragment) manager.findFragmentByTag("我的");

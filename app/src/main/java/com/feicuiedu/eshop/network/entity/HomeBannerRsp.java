@@ -24,7 +24,7 @@ public class HomeBannerRsp {
         return mData;
     }
 
-    class Data {
+    public static class Data {
 
         @SerializedName("player")
         private List<Banner> mBanners;

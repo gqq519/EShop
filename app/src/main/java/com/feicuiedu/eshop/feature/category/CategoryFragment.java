@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,6 +27,7 @@ import com.feicuiedu.eshop.network.EShopClient;
 import com.feicuiedu.eshop.network.entity.CategoryPrimary;
 import com.feicuiedu.eshop.network.entity.CategoryRsp;
 
+import java.io.IOException;
 import java.util.List;
 
 import butterknife.BindView;
@@ -59,7 +62,25 @@ public class CategoryFragment extends BaseFragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_category, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Toast.makeText(getContext(), mCategoryAdapter.getItem(mListCategory.getCheckedItemPosition()).getName(), Toast.LENGTH_SHORT).show();
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected void initView() {
+
+        setHasOptionsMenu(true);
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity.setSupportActionBar(mToolbar);
+
+        activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         // toolbar
         mToolbarTitle.setText(R.string.category_title);
@@ -71,9 +92,9 @@ public class CategoryFragment extends BaseFragment {
         mChildrenAdapter = new ChildrenAdapter();
         mListChildren.setAdapter(mChildrenAdapter);
 
-        if (mData!=null){
+        if (mData != null) {
             updateCategory();
-        }else {
+        } else {
             // 执行网络请求的操作
             enqueue();
         }
@@ -82,22 +103,26 @@ public class CategoryFragment extends BaseFragment {
     // 执行网络请求
     private void enqueue() {
 
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 super.run();
 
-                final CategoryRsp categoryRsp = EShopClient.getInstance().getCategory();
-
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (categoryRsp!=null){
-                            mData = categoryRsp.getData();
-                            updateCategory();
+                final CategoryRsp categoryRsp;
+                try {
+                    categoryRsp = EShopClient.getInstance().getCategory();
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (categoryRsp != null) {
+                                mData = categoryRsp.getData();
+                                updateCategory();
+                            }
                         }
-                    }
-                });
+                    });
+                } catch (IOException e) {
+                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
             }
         }.start();
     }
@@ -110,17 +135,17 @@ public class CategoryFragment extends BaseFragment {
 
     // 切换一级展示的二级分类的内容
     private void chooseCategory(int position) {
-        mListCategory.setItemChecked(position,true);
+        mListCategory.setItemChecked(position, true);
         mChildrenAdapter.reset(mData.get(position).getChildren());
     }
 
     @OnItemClick(R.id.list_category)
-    public void onItemClick(int position){
+    public void onItemClick(int position) {
         chooseCategory(position);
     }
 
     @OnItemClick(R.id.list_children)
-    public void onChildItemClick(int position){
+    public void onChildItemClick(int position) {
         Toast.makeText(getContext(), mChildrenAdapter.getItem(position).getName(), Toast.LENGTH_SHORT).show();
     }
 }
