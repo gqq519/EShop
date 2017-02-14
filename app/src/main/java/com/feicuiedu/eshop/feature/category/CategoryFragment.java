@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.feicuiedu.eshop.R;
 import com.feicuiedu.eshop.base.BaseFragment;
 import com.feicuiedu.eshop.base.utils.LogUtils;
+import com.feicuiedu.eshop.base.wrapper.ToolbarWrapper;
 import com.feicuiedu.eshop.feature.EShopMainActivity;
 import com.feicuiedu.eshop.network.EShopClient;
 import com.feicuiedu.eshop.network.entity.CategoryPrimary;
@@ -76,14 +77,8 @@ public class CategoryFragment extends BaseFragment {
     @Override
     protected void initView() {
 
-        setHasOptionsMenu(true);
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        activity.setSupportActionBar(mToolbar);
-
-        activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
-
         // toolbar
-        mToolbarTitle.setText(R.string.category_title);
+        new ToolbarWrapper(this).setCustomTitle(R.string.category_title);
 
         // 设置适配器：创建及实现
         mCategoryAdapter = new CategoryAdapter();

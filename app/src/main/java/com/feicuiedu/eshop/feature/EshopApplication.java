@@ -2,6 +2,7 @@ package com.feicuiedu.eshop.feature;
 
 import android.app.Application;
 
+import com.feicuiedu.eshop.base.wrapper.ToastWrapper;
 import com.squareup.leakcanary.LeakCanary;
 
 /**
@@ -25,5 +26,6 @@ public class EshopApplication extends Application {
         LeakCanary.install(this);
 
         // 项目正常初始化工作
+        ToastWrapper.init(this);
     }
 }

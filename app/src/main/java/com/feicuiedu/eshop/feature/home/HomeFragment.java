@@ -15,6 +15,8 @@ import com.feicuiedu.eshop.R;
 import com.feicuiedu.eshop.base.BaseFragment;
 import com.feicuiedu.eshop.base.widgets.BannerAdapter;
 import com.feicuiedu.eshop.base.widgets.BannerLayout;
+import com.feicuiedu.eshop.base.wrapper.PtrWrapper;
+import com.feicuiedu.eshop.base.wrapper.ToolbarWrapper;
 import com.feicuiedu.eshop.network.EShopClient;
 import com.feicuiedu.eshop.network.entity.Banner;
 import com.feicuiedu.eshop.network.entity.HomeBannerRsp;
@@ -49,14 +51,13 @@ public class HomeFragment extends BaseFragment {
     Toolbar mToolbar;
     @BindView(R.id.list_home_goods)
     ListView mListHomeGoods;
-    @BindView(R.id.standard_refresh_layout)
-    PtrFrameLayout mRefreshLayout;
 
     private ImageView[] mIvPromotes = new ImageView[4];
     private TextView mTvPromoteGoods;
     private HomeGoodsAdapter mGoodsAdapter;
     private Handler mHandler;
     private BannerAdapter<Banner> mBannerAdapter;
+    private PtrWrapper mPtrWrapper;
 
     @Override
     protected int getContentViewLayout() {
@@ -66,9 +67,19 @@ public class HomeFragment extends BaseFragment {
     @Override
     protected void initView() {
 
-        initToolbar();
+        // Toolbar
+        new ToolbarWrapper(this).setCustomTitle(R.string.home_title);
 
-        initPtr();
+        // 刷新
+        // 刷新获取数据
+        mPtrWrapper = new PtrWrapper(this) {
+            @Override
+            public void onRefresh() {
+                // 刷新获取数据
+                getHomeGoodsData();
+            }
+        };
+        mPtrWrapper.postRefreshDelayed(50);
 
         mHandler = new Handler();
 
@@ -108,52 +119,6 @@ public class HomeFragment extends BaseFragment {
         mListHomeGoods.addHeaderView(view);
     }
 
-    private void initToolbar() {
-        // 设置Toolbar
-        setHasOptionsMenu(true);
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        activity.setSupportActionBar(mToolbar);
-        activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
-        mToolbarTitle.setText(R.string.home_title);
-    }
-
-    // 下拉刷新
-    private void initPtr() {
-        mRefreshLayout.disableWhenHorizontalMove(true);
-
-        // 刷新的头布局
-        PtrClassicDefaultHeader header = new PtrClassicDefaultHeader(getContext());
-        mRefreshLayout.setHeaderView(header);
-        mRefreshLayout.addPtrUIHandler(header);
-
-        mRefreshLayout.setPtrHandler(mPtrHandler);
-        mRefreshLayout.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mRefreshLayout.autoRefresh();
-            }
-        }, 50);
-    }
-
-    private PtrHandler mPtrHandler = new PtrDefaultHandler() {
-        @Override
-        public void onRefreshBegin(PtrFrameLayout frame) {
-            mRefreshLayout.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    // 获取数据
-//                    for (int i = 0; i < 20; i++) {
-//                        mAdapter.add("测试数据");
-//                    }
-//                    mAdapter.notifyDataSetChanged();
-//                    mRefreshLayout.refreshComplete();
-
-                    getHomeGoodsData();
-                }
-            }, 3000);
-        }
-    };
-
     private void getHomeGoodsData() {
         new Thread(new Runnable() {
             @Override
@@ -179,7 +144,7 @@ public class HomeFragment extends BaseFragment {
                                 // 设置促销的商品
                                 setPromoteGoods(homeBannerRsp.getData().getGoodsList());
                             }
-                            mRefreshLayout.refreshComplete();
+                            mPtrWrapper.stopRefresh();
                         }
                     });
 
@@ -191,7 +156,7 @@ public class HomeFragment extends BaseFragment {
                                     e.getMessage(),
                                     Toast.LENGTH_SHORT)
                                     .show();
-                            mRefreshLayout.refreshComplete();
+                            mPtrWrapper.stopRefresh();
                         }
                     });
                 }

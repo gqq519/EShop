@@ -61,7 +61,6 @@ public class EShopMainActivity extends BaseActivity implements OnTabSelectListen
         mBottomBar.setOnTabSelectListener(this);
     }
 
-
     @Override
     public void onTabSelected(@IdRes int tabId) {
         switch (tabId) {
