@@ -18,6 +18,8 @@ import com.feicuiedu.eshop.base.widgets.BannerLayout;
 import com.feicuiedu.eshop.base.wrapper.PtrWrapper;
 import com.feicuiedu.eshop.base.wrapper.ToolbarWrapper;
 import com.feicuiedu.eshop.network.EShopClient;
+import com.feicuiedu.eshop.network.core.ResponseEntity;
+import com.feicuiedu.eshop.network.core.UiCallback;
 import com.feicuiedu.eshop.network.entity.Banner;
 import com.feicuiedu.eshop.network.entity.HomeBannerRsp;
 import com.feicuiedu.eshop.network.entity.HomeCategoryRsp;
@@ -55,9 +57,11 @@ public class HomeFragment extends BaseFragment {
     private ImageView[] mIvPromotes = new ImageView[4];
     private TextView mTvPromoteGoods;
     private HomeGoodsAdapter mGoodsAdapter;
-    private Handler mHandler;
     private BannerAdapter<Banner> mBannerAdapter;
     private PtrWrapper mPtrWrapper;
+
+    private boolean mBannerRefreshed = false;
+    private boolean mCategoryRefreshed = false;
 
     @Override
     protected int getContentViewLayout() {
@@ -75,13 +79,14 @@ public class HomeFragment extends BaseFragment {
         mPtrWrapper = new PtrWrapper(this) {
             @Override
             public void onRefresh() {
+
+                mBannerRefreshed = false;
+                mCategoryRefreshed = false;
                 // 刷新获取数据
                 getHomeGoodsData();
             }
         };
         mPtrWrapper.postRefreshDelayed(50);
-
-        mHandler = new Handler();
 
         mGoodsAdapter = new HomeGoodsAdapter();
         mListHomeGoods.setAdapter(mGoodsAdapter);
@@ -120,48 +125,39 @@ public class HomeFragment extends BaseFragment {
     }
 
     private void getHomeGoodsData() {
-        new Thread(new Runnable() {
+        UiCallback categoryCb = new UiCallback() {
             @Override
-            public void run() {
-
-                EShopClient client = EShopClient.getInstance();
-
-                try {
-                    final HomeCategoryRsp categoryRsp = client.getHomeCategoryRsp();
-                    final HomeBannerRsp homeBannerRsp = client.getHomeBannerRsp();
-
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            // 拿到结果更新UI
-                            if (categoryRsp.getStatus().isSucceed()) {
-                                mGoodsAdapter.reset(categoryRsp.getData());
-                            } else {
-                                Toast.makeText(getContext(), categoryRsp.getStatus().getErrorDesc(), Toast.LENGTH_SHORT).show();
-                            }
-                            if (homeBannerRsp.getStatus().isSucceed()) {
-                                mBannerAdapter.reset(homeBannerRsp.getData().getBanners());
-                                // 设置促销的商品
-                                setPromoteGoods(homeBannerRsp.getData().getGoodsList());
-                            }
-                            mPtrWrapper.stopRefresh();
-                        }
-                    });
-
-                } catch (final IOException e) {
-                    mHandler.post(new Runnable() {
-                        @Override public void run() {
-                            // 显示错误提示
-                            Toast.makeText(getContext(),
-                                    e.getMessage(),
-                                    Toast.LENGTH_SHORT)
-                                    .show();
-                            mPtrWrapper.stopRefresh();
-                        }
-                    });
+            public void onBusinessResponse(boolean success, ResponseEntity responseEntity) {
+                mCategoryRefreshed = true;
+                if (success) {
+                    HomeCategoryRsp categoryRsp = (HomeCategoryRsp) responseEntity;
+                    mGoodsAdapter.reset(categoryRsp.getData());
+                }
+                if (mBannerRefreshed && mCategoryRefreshed) {
+                    // 两个接口的数据都返回了, 才停止下拉刷新.
+                    mPtrWrapper.stopRefresh();
                 }
             }
-        }).start();
+        };
+        UiCallback bannerCb = new UiCallback() {
+            @Override
+            public void onBusinessResponse(boolean success, ResponseEntity responseEntity) {
+                mBannerRefreshed = true;
+                if (success) {
+                    HomeBannerRsp bannerRsp = (HomeBannerRsp) responseEntity;
+                    mBannerAdapter.reset(bannerRsp.getData().getBanners());
+                    setPromoteGoods(bannerRsp.getData().getGoodsList());
+                }
+                if (mBannerRefreshed && mCategoryRefreshed) {
+                    // 两个接口的数据都返回了, 才停止下拉刷新.
+                    mPtrWrapper.stopRefresh();
+                }
+            }
+        };
+        EShopClient.getInstance()
+                .enqueue("/home/data", null, HomeBannerRsp.class, bannerCb);
+        EShopClient.getInstance()
+                .enqueue("/home/category", null, HomeCategoryRsp.class, categoryCb);
     }
 
     private void setPromoteGoods(List<SimpleGoods> list) {

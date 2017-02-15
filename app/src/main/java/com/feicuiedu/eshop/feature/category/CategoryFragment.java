@@ -25,6 +25,8 @@ import com.feicuiedu.eshop.base.utils.LogUtils;
 import com.feicuiedu.eshop.base.wrapper.ToolbarWrapper;
 import com.feicuiedu.eshop.feature.EShopMainActivity;
 import com.feicuiedu.eshop.network.EShopClient;
+import com.feicuiedu.eshop.network.core.ResponseEntity;
+import com.feicuiedu.eshop.network.core.UiCallback;
 import com.feicuiedu.eshop.network.entity.CategoryPrimary;
 import com.feicuiedu.eshop.network.entity.CategoryRsp;
 
@@ -97,29 +99,16 @@ public class CategoryFragment extends BaseFragment {
 
     // 执行网络请求
     private void enqueue() {
-
-        new Thread() {
+        UiCallback uiCallback = new UiCallback() {
             @Override
-            public void run() {
-                super.run();
-
-                final CategoryRsp categoryRsp;
-                try {
-                    categoryRsp = EShopClient.getInstance().getCategory();
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (categoryRsp != null) {
-                                mData = categoryRsp.getData();
-                                updateCategory();
-                            }
-                        }
-                    });
-                } catch (IOException e) {
-                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onBusinessResponse(boolean success, ResponseEntity responseEntity) {
+                if (success){
+                    mData = ((CategoryRsp)responseEntity).getData();
+                    updateCategory();
                 }
             }
-        }.start();
+        };
+        EShopClient.getInstance().enqueue("/category",null,CategoryRsp.class,uiCallback);
     }
 
     // 更新分类信息

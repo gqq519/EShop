@@ -1,5 +1,8 @@
 package com.feicuiedu.eshop.network;
 
+import com.feicuiedu.eshop.network.core.RequestParam;
+import com.feicuiedu.eshop.network.core.ResponseEntity;
+import com.feicuiedu.eshop.network.core.UiCallback;
 import com.feicuiedu.eshop.network.entity.CategoryRsp;
 import com.feicuiedu.eshop.network.entity.HomeBannerRsp;
 import com.feicuiedu.eshop.network.entity.HomeCategoryRsp;
@@ -10,6 +13,7 @@ import com.google.gson.Gson;
 import java.io.IOException;
 
 import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -52,94 +56,57 @@ public class EShopClient {
     }
 
 
-    // 分类：获取商品分类的数据
-    public CategoryRsp getCategory() throws IOException {
+    // 将响应转换为相应的实体类型
+    public  <T extends ResponseEntity>T getResponseEntity(Response response, Class<T> clazz) throws IOException {
 
-        CategoryRsp categoryRsp = new CategoryRsp();
-
-        // 构建请求和拿到响应
-        Request request = new Request.Builder()
-                .get()
-                .url(BASE_URL + "/category")
-                .build();
-
-        // 拿到响应解析
-        Response response = mOkHttpClient.newCall(request).execute();
-
-        if (!response.isSuccessful()) {
-            throw new IOException("Response code is" + response.code());
+        if (!response.isSuccessful()){
+            throw new IOException("Response code is"+response.code());
         }
-
-        ResponseBody body = response.body();
-        categoryRsp = mGson.fromJson(body.string(), CategoryRsp.class);
-        return categoryRsp;
+        return mGson.fromJson(response.body().string(),clazz);
     }
 
-    // 首页：轮播图
-    public HomeBannerRsp getHomeBannerRsp() throws IOException {
-        HomeBannerRsp homeBannerRsp = new HomeBannerRsp();
+    /**
+     * 之前构建请求的方法重复性代码太多，所以进行封装
+     * 每一个请求构建过程都一样，不同的是请求地址、请求参数、响应类型
+     * 请求分为两种：同步和异步
+     */
 
-        Request request = new Request.Builder()
-                .get()
-                .url(BASE_URL + "/home/data")
-                .build();
+    // 同步方法
+    public <T extends ResponseEntity>T execute(String path,
+                                               RequestParam requestParam,
+                                               Class<T> clazz) throws IOException {
+        // 将构建的过程提取成一个方法
 
-        Response response = mOkHttpClient.newCall(request).execute();
-
-        if (!response.isSuccessful()) {
-            throw new IOException("Response code is" + response.code());
-        }
-
-        String json = response.body().string();
-
-        homeBannerRsp = mGson.fromJson(json, HomeBannerRsp.class);
-
-        return homeBannerRsp;
+        Response response = newApiCall(path, requestParam).execute();
+        return getResponseEntity(response,clazz);
     }
 
-    // 首页的分类及推荐商品
-    public HomeCategoryRsp getHomeCategoryRsp() throws IOException {
-        HomeCategoryRsp homeCategoryRsp = new HomeCategoryRsp();
-        Request request = new Request.Builder()
-                .get()
-                .url(BASE_URL + "/home/category")
-                .build();
+    // 异步方法
+    public Call enqueue(String path,
+                        RequestParam requestParam,
+                        Class<? extends ResponseEntity> clazz,
+                        UiCallback uiCallback){
+        // 将构建的过程提取成一个方法
+        Call call = newApiCall(path, requestParam);
+        call.enqueue(uiCallback);
+        uiCallback.setResponseType(clazz);
+        return call;
 
-            Response response = mOkHttpClient.newCall(request).execute();
-
-            if (!response.isSuccessful()) {
-                throw new IOException("Response code is"+response.code());
-            }
-            String json = response.body().string();
-            homeCategoryRsp = mGson.fromJson(json, HomeCategoryRsp.class);
-            return homeCategoryRsp;
     }
 
-    // 商品分类的搜索：POST请求
-    public SearchRsp getSearchGoods(SearchReq searchReq) throws IOException {
+    private Call newApiCall(String path, RequestParam requestParam) {
+        Request.Builder builder = new Request.Builder();
+        builder.url(BASE_URL + path);
 
-//        RequestBody body = RequestBody.create(null,mGson.toJson(searchReq));
-        RequestBody body = new FormBody.Builder()
-                .add("json",mGson.toJson(searchReq))
-                .build();
-
-        Request request = new Request.Builder()
-                .post(body)
-                .url(BASE_URL+"/search")
-                .build();
-        // 构建OkHttp Call对象.
-        Call call = mOkHttpClient.newCall(request);
-        // 执行Call对象, 获取OkHttp Response对象.
-        Response response = call.execute();
-
-        // 判断响应是否成功(响应码是200~299之间).
-        if (!response.isSuccessful()) {
-            throw new IOException("Response code is " + response.code());
+        if (requestParam != null) {
+            String param = mGson.toJson(requestParam);
+            FormBody formBody = new FormBody.Builder()
+                    .add("json", param)
+                    .build();
+            builder.post(formBody);
         }
-
-        // 对响应体做Gson转换, 返回实体类对象.
-        return mGson.fromJson(response.body().charStream(), SearchRsp.class);
-
+        Request request = builder.build();
+        return mOkHttpClient.newCall(request);
     }
 
 }

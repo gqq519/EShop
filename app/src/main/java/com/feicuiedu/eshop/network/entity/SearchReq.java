@@ -1,9 +1,10 @@
 package com.feicuiedu.eshop.network.entity;
 
 
+import com.feicuiedu.eshop.network.core.RequestParam;
 import com.google.gson.annotations.SerializedName;
 
-public class SearchReq {
+public class SearchReq extends RequestParam{
 
     @SerializedName("filter") private Filter mFilter;
 

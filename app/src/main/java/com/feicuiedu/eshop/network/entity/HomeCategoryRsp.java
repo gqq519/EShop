@@ -1,5 +1,6 @@
 package com.feicuiedu.eshop.network.entity;
 
+import com.feicuiedu.eshop.network.core.ResponseEntity;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -8,19 +9,13 @@ import java.util.List;
  * Created by gqq on 2017/2/13.
  */
 
-public class HomeCategoryRsp {
+public class HomeCategoryRsp extends ResponseEntity{
 
     @SerializedName("data")
     private List<CategoryHome> mData;
-
-    @SerializedName("status")
-    private Status mStatus;
 
     public List<CategoryHome> getData() {
         return mData;
     }
 
-    public Status getStatus() {
-        return mStatus;
-    }
 }
