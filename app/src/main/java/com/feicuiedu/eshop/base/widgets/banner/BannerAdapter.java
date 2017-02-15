@@ -1,4 +1,4 @@
-package com.feicuiedu.eshop.base.widgets;
+package com.feicuiedu.eshop.base.widgets.banner;
 
 import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;

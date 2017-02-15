@@ -1,6 +1,7 @@
 package com.feicuiedu.eshop.feature.category;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -24,11 +25,13 @@ import com.feicuiedu.eshop.base.BaseFragment;
 import com.feicuiedu.eshop.base.utils.LogUtils;
 import com.feicuiedu.eshop.base.wrapper.ToolbarWrapper;
 import com.feicuiedu.eshop.feature.EShopMainActivity;
+import com.feicuiedu.eshop.feature.search.SearchGoodsActivity;
 import com.feicuiedu.eshop.network.EShopClient;
 import com.feicuiedu.eshop.network.core.ResponseEntity;
 import com.feicuiedu.eshop.network.core.UiCallback;
 import com.feicuiedu.eshop.network.entity.CategoryPrimary;
 import com.feicuiedu.eshop.network.entity.CategoryRsp;
+import com.feicuiedu.eshop.network.entity.Filter;
 
 import java.io.IOException;
 import java.util.List;
@@ -72,7 +75,18 @@ public class CategoryFragment extends BaseFragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Toast.makeText(getContext(), mCategoryAdapter.getItem(mListCategory.getCheckedItemPosition()).getName(), Toast.LENGTH_SHORT).show();
+
+        switch (item.getItemId()) {
+            // 跳转到搜索页面
+            case R.id.menu_search:
+
+                int position = mListCategory.getCheckedItemPosition();
+                int categoryId = mCategoryAdapter.getItem(position).getId();
+                navigateToSearch(categoryId);
+                break;
+        }
+
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -102,13 +116,13 @@ public class CategoryFragment extends BaseFragment {
         UiCallback uiCallback = new UiCallback() {
             @Override
             public void onBusinessResponse(boolean success, ResponseEntity responseEntity) {
-                if (success){
-                    mData = ((CategoryRsp)responseEntity).getData();
+                if (success) {
+                    mData = ((CategoryRsp) responseEntity).getData();
                     updateCategory();
                 }
             }
         };
-        EShopClient.getInstance().enqueue("/category",null,CategoryRsp.class,uiCallback);
+        EShopClient.getInstance().enqueue("/category", null, CategoryRsp.class, uiCallback);
     }
 
     // 更新分类信息
@@ -130,6 +144,12 @@ public class CategoryFragment extends BaseFragment {
 
     @OnItemClick(R.id.list_children)
     public void onChildItemClick(int position) {
-        Toast.makeText(getContext(), mChildrenAdapter.getItem(position).getName(), Toast.LENGTH_SHORT).show();
+        navigateToSearch(mChildrenAdapter.getItem(position).getId());
+    }
+
+    private void navigateToSearch(int categoryId) {
+        Filter filter = new Filter();
+        filter.setCategoryId(categoryId);
+        SearchGoodsActivity.open(getContext(), filter);
     }
 }

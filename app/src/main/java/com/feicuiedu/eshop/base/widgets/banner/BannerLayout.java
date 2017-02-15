@@ -1,4 +1,4 @@
-package com.feicuiedu.eshop.base.widgets;
+package com.feicuiedu.eshop.base.widgets.banner;
 
 import android.content.Context;
 import android.os.Handler;

@@ -1,11 +1,8 @@
 package com.feicuiedu.eshop.feature.home;
 
-import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -13,8 +10,8 @@ import android.widget.Toast;
 
 import com.feicuiedu.eshop.R;
 import com.feicuiedu.eshop.base.BaseFragment;
-import com.feicuiedu.eshop.base.widgets.BannerAdapter;
-import com.feicuiedu.eshop.base.widgets.BannerLayout;
+import com.feicuiedu.eshop.base.widgets.banner.BannerAdapter;
+import com.feicuiedu.eshop.base.widgets.banner.BannerLayout;
 import com.feicuiedu.eshop.base.wrapper.PtrWrapper;
 import com.feicuiedu.eshop.base.wrapper.ToolbarWrapper;
 import com.feicuiedu.eshop.network.EShopClient;
@@ -25,19 +22,10 @@ import com.feicuiedu.eshop.network.entity.HomeBannerRsp;
 import com.feicuiedu.eshop.network.entity.HomeCategoryRsp;
 import com.feicuiedu.eshop.network.entity.SimpleGoods;
 
-import org.w3c.dom.Text;
-
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.BindViews;
 import butterknife.ButterKnife;
-import in.srain.cube.views.ptr.PtrClassicDefaultHeader;
-import in.srain.cube.views.ptr.PtrDefaultHandler;
-import in.srain.cube.views.ptr.PtrFrameLayout;
-import in.srain.cube.views.ptr.PtrHandler;
 
 /**
  * Created by gqq on 2017/2/13.

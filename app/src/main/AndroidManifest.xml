@@ -20,6 +20,8 @@
         </activity>
         <activity android:name=".feature.EShopMainActivity">
         </activity>
+        <activity android:name=".feature.search.SearchGoodsActivity">
+        </activity>
     </application>
 
 </manifest>
