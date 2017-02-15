@@ -3,12 +3,17 @@ package com.feicuiedu.eshop.network;
 import com.feicuiedu.eshop.network.entity.CategoryRsp;
 import com.feicuiedu.eshop.network.entity.HomeBannerRsp;
 import com.feicuiedu.eshop.network.entity.HomeCategoryRsp;
+import com.feicuiedu.eshop.network.entity.SearchReq;
+import com.feicuiedu.eshop.network.entity.SearchRsp;
 import com.google.gson.Gson;
 
 import java.io.IOException;
 
+import okhttp3.Call;
+import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -23,6 +28,7 @@ public class EShopClient {
 
     private static EShopClient mEShopClient;
     private final OkHttpClient mOkHttpClient;
+    private Gson mGson;
 
     public static synchronized EShopClient getInstance() {
         if (mEShopClient == null) {
@@ -32,6 +38,8 @@ public class EShopClient {
     }
 
     private EShopClient() {
+
+        mGson = new Gson();
 
         // 日志拦截器
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
@@ -63,7 +71,7 @@ public class EShopClient {
         }
 
         ResponseBody body = response.body();
-        categoryRsp = new Gson().fromJson(body.string(), CategoryRsp.class);
+        categoryRsp = mGson.fromJson(body.string(), CategoryRsp.class);
         return categoryRsp;
     }
 
@@ -83,7 +91,8 @@ public class EShopClient {
         }
 
         String json = response.body().string();
-        homeBannerRsp = new Gson().fromJson(json, HomeBannerRsp.class);
+
+        homeBannerRsp = mGson.fromJson(json, HomeBannerRsp.class);
 
         return homeBannerRsp;
     }
@@ -102,7 +111,35 @@ public class EShopClient {
                 throw new IOException("Response code is"+response.code());
             }
             String json = response.body().string();
-            homeCategoryRsp = new Gson().fromJson(json, HomeCategoryRsp.class);
+            homeCategoryRsp = mGson.fromJson(json, HomeCategoryRsp.class);
             return homeCategoryRsp;
     }
+
+    // 商品分类的搜索：POST请求
+    public SearchRsp getSearchGoods(SearchReq searchReq) throws IOException {
+
+//        RequestBody body = RequestBody.create(null,mGson.toJson(searchReq));
+        RequestBody body = new FormBody.Builder()
+                .add("json",mGson.toJson(searchReq))
+                .build();
+
+        Request request = new Request.Builder()
+                .post(body)
+                .url(BASE_URL+"/search")
+                .build();
+        // 构建OkHttp Call对象.
+        Call call = mOkHttpClient.newCall(request);
+        // 执行Call对象, 获取OkHttp Response对象.
+        Response response = call.execute();
+
+        // 判断响应是否成功(响应码是200~299之间).
+        if (!response.isSuccessful()) {
+            throw new IOException("Response code is " + response.code());
+        }
+
+        // 对响应体做Gson转换, 返回实体类对象.
+        return mGson.fromJson(response.body().charStream(), SearchRsp.class);
+
+    }
+
 }

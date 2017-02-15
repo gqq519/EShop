@@ -3,6 +3,8 @@ package com.feicuiedu.eshop.network;
 import com.feicuiedu.eshop.network.entity.CategoryRsp;
 import com.feicuiedu.eshop.network.entity.HomeBannerRsp;
 import com.feicuiedu.eshop.network.entity.HomeCategoryRsp;
+import com.feicuiedu.eshop.network.entity.SearchReq;
+import com.feicuiedu.eshop.network.entity.SearchRsp;
 
 import org.junit.After;
 import org.junit.Before;
@@ -43,5 +45,12 @@ public class EShopClientTest {
     public void getHomeCategory() throws Exception{
         HomeCategoryRsp homeCategoryRsp = mClient.getHomeCategoryRsp();
         assertTrue(homeCategoryRsp.getStatus().isSucceed());
+    }
+
+    @Test
+    public void getSearchGoods() throws Exception{
+        SearchReq searchReq = new SearchReq();
+        SearchRsp searchGoods = mClient.getSearchGoods(searchReq);
+        assertTrue(searchGoods.getStatus().isSucceed());
     }
 }
