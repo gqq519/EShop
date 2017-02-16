@@ -34,7 +34,7 @@ dependencies {
     // 指示器
     compile 'me.relex:circleindicator:1.2.2@aar'
     // 刷新加载
-    compile 'in.srain.cube:ultra-ptr:1.0.11'
+    compile 'in.srain.cube:ptr-load-more:1.0.6'
     // 底部切换条
     compile 'com.roughike:bottom-bar:2.0.2'
     // butterknife

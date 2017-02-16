@@ -12,12 +12,22 @@ import android.widget.TextView;
 
 import com.feicuiedu.eshop.R;
 import com.feicuiedu.eshop.base.BaseActivity;
+import com.feicuiedu.eshop.base.utils.LogUtils;
 import com.feicuiedu.eshop.base.widgets.SimpleSearchView;
 import com.feicuiedu.eshop.base.widgets.loadmore.EndlessScrollListener;
 import com.feicuiedu.eshop.base.widgets.loadmore.LoadMoreFooter;
+import com.feicuiedu.eshop.base.wrapper.PtrWrapper;
 import com.feicuiedu.eshop.base.wrapper.ToastWrapper;
 import com.feicuiedu.eshop.base.wrapper.ToolbarWrapper;
+import com.feicuiedu.eshop.network.EShopClient;
+import com.feicuiedu.eshop.network.core.ResponseEntity;
+import com.feicuiedu.eshop.network.core.UiCallback;
 import com.feicuiedu.eshop.network.entity.Filter;
+import com.feicuiedu.eshop.network.entity.Paginated;
+import com.feicuiedu.eshop.network.entity.Pagination;
+import com.feicuiedu.eshop.network.entity.SearchReq;
+import com.feicuiedu.eshop.network.entity.SearchRsp;
+import com.feicuiedu.eshop.network.entity.SimpleGoods;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -25,12 +35,25 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.BindViews;
+import butterknife.OnClick;
+import in.srain.cube.views.ptr.PtrFrameLayout;
+import okhttp3.Call;
 
 public class SearchGoodsActivity extends BaseActivity {
 
     private static final String EXTRA_SEARCH_FILTER = "EXTRA_SEARCH_FILTER";
     private int mData;
     private LoadMoreFooter mFooter;
+    private PtrWrapper mPtrWrapper;
+
+    private Filter mFilter;
+    private final Pagination mPagination = new Pagination();
+
+    private Call mSearchCall;
+    private long mLastRefreshTime;
+    private SearchGoodsAdapter mGoodsAdapter;
+    private Paginated mPaginated = new Paginated();
+
 
     public static void open(Context context, @Nullable Filter filter) {
 
@@ -48,8 +71,6 @@ public class SearchGoodsActivity extends BaseActivity {
     @BindViews({R.id.text_is_hot, R.id.text_most_expensive, R.id.text_cheapest})
     List<TextView> mTvOrderList;
 
-    private int mIndex;
-
     @Override
     protected int getContentViewLayout() {
         return R.layout.activity_search_goods;
@@ -59,45 +80,119 @@ public class SearchGoodsActivity extends BaseActivity {
     protected void initView() {
         new ToolbarWrapper(this);
 
+        // 布局样式
+        mTvOrderList.get(0).setActivated(true);
+
+        // 取出数据
+        String json = getIntent().getStringExtra(EXTRA_SEARCH_FILTER);
+        mFilter = new Gson().fromJson(json, Filter.class);
+
+        // 下拉刷新+上拉加载
+        mPtrWrapper = new PtrWrapper(this, true) {
+            @Override
+            public void onRefresh() {
+                // 搜索商品
+                searchGoods(true);
+            }
+
+            @Override
+            public void onLoadMore() {
+                // 加载
+                if (mPaginated.hasMore()) {
+                    searchGoods(false);
+                }else {
+                    mPtrWrapper.stopRefresh();
+                    ToastWrapper.show("无更多数据");
+                }
+
+            }
+        };
+
         mSearchView.setOnSearchListener(new SimpleSearchView.OnSearchListener() {
             @Override
             public void search(String text) {
-                ToastWrapper.show(text);
+                // 根据输入信息搜索
+                mFilter.setKeywords(text);
+                mPtrWrapper.autoRefresh();
             }
         });
 
-        final ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(this, android.R.layout.simple_list_item_1, getData());
-        mGoodsListView.setAdapter(adapter);
+        // 设置适配器
+        mGoodsAdapter = new SearchGoodsAdapter();
+        mGoodsListView.setAdapter(mGoodsAdapter);
+    }
 
-        mFooter = new LoadMoreFooter(this);
-        mGoodsListView.addFooterView(mFooter);
-        mGoodsListView.setOnScrollListener(new EndlessScrollListener(1) {
-            @Override
-            protected boolean onLoadMore() {
-                if (mIndex >= 100) {
-                    mFooter.setState(LoadMoreFooter.STATE_COMPLETE);
-                    return false;
+    @OnClick({R.id.text_is_hot, R.id.text_most_expensive, R.id.text_cheapest})
+    void chooseQueryOrder(TextView textView) {
+
+        if (textView.isActivated()) return;
+
+        if (mPtrWrapper.isRefreshing()) return;
+
+        for (TextView tv : mTvOrderList) {
+            tv.setActivated(false);
+        }
+        textView.setActivated(true);
+
+        String sortBy;
+
+        switch (textView.getId()) {
+            case R.id.text_is_hot:
+                sortBy = Filter.SORT_IS_HOT;
+                break;
+            case R.id.text_most_expensive:
+                sortBy = Filter.SORT_PRICE_DESC;
+                break;
+            case R.id.text_cheapest:
+                sortBy = Filter.SORT_PRICE_ASC;
+                break;
+            default:
+                throw new UnsupportedOperationException();
+        }
+
+        mFilter.setSortBy(sortBy);
+        mPtrWrapper.autoRefresh();
+    }
+
+    // 搜素商品
+    private void searchGoods(final boolean isRefresh) {
+
+        if (mSearchCall != null) {
+            mSearchCall.cancel();
+        }
+
+        if (isRefresh) {
+            mPagination.reset();
+        } else {
+            mPagination.next();
+            LogUtils.debug("Load more, page = %s", mPagination.getPage());
+        }
+
+        SearchReq req = new SearchReq();
+        req.setFilter(mFilter);
+        req.setPagination(mPagination);
+        mSearchCall = EShopClient.getInstance()
+                .enqueue("/search", req, SearchRsp.class, mUiCallback);
+    }
+
+    private UiCallback mUiCallback = new UiCallback() {
+        @Override
+        public void onBusinessResponse(boolean success, ResponseEntity responseEntity) {
+            // 拿到数据处理
+            mPtrWrapper.stopRefresh();
+            mSearchCall = null;
+            if (success) {
+
+                SearchRsp searchRsp = (SearchRsp) responseEntity;
+
+                mPaginated = searchRsp.getPaginated();
+                List<SimpleGoods> goodsList = searchRsp.getData();
+                if (mPagination.isFirst()) {
+                    mGoodsAdapter.reset(goodsList);
                 } else {
-                    mFooter.setState(LoadMoreFooter.STATE_LOADING);
-                    mGoodsListView.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            adapter.addAll(getData());
-                            mFooter.setState(LoadMoreFooter.STATE_LOADED);
-                        }
-                    }, 3000);
-                    return true;
+                    mGoodsAdapter.addAll(goodsList);
                 }
             }
-        });
-    }
-
-
-    private List<Integer> getData() {
-        List<Integer> data = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            data.add(mIndex++);
         }
-        return data;
-    }
+    };
 }

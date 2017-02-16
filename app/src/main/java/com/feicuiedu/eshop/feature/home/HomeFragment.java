@@ -64,7 +64,7 @@ public class HomeFragment extends BaseFragment {
 
         // 刷新
         // 刷新获取数据
-        mPtrWrapper = new PtrWrapper(this) {
+        mPtrWrapper = new PtrWrapper(this,false) {
             @Override
             public void onRefresh() {
 
@@ -72,6 +72,11 @@ public class HomeFragment extends BaseFragment {
                 mCategoryRefreshed = false;
                 // 刷新获取数据
                 getHomeGoodsData();
+            }
+
+            @Override
+            public void onLoadMore() {
+
             }
         };
         mPtrWrapper.postRefreshDelayed(50);
@@ -113,6 +118,7 @@ public class HomeFragment extends BaseFragment {
     }
 
     private void getHomeGoodsData() {
+
         UiCallback categoryCb = new UiCallback() {
             @Override
             public void onBusinessResponse(boolean success, ResponseEntity responseEntity) {
@@ -142,6 +148,7 @@ public class HomeFragment extends BaseFragment {
                 }
             }
         };
+
         EShopClient.getInstance()
                 .enqueue("/home/data", null, HomeBannerRsp.class, bannerCb);
         EShopClient.getInstance()
