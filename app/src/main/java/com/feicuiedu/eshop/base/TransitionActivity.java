@@ -14,6 +14,17 @@ import com.feicuiedu.eshop.R;
 public class TransitionActivity extends AppCompatActivity{
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId()==android.R.id.home){
+            onBackPressed();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void startActivity(Intent intent) {
         super.startActivity(intent);
         setTransitionAnimation(true);

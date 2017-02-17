@@ -11,6 +11,8 @@
     <color name="black">#404245</color>
 
     <!-- 基本颜色 -->
+    <color name="purple">#7A71E9</color>
     <color name="orange">#F16755</color>
+    <color name="pink">#F06CA7</color>
     <color name="brown">#847534</color>
 </resources>

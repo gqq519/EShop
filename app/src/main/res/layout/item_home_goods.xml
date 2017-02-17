@@ -25,22 +25,26 @@
             android:id="@+id/image_goods_01"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:scaleType="centerCrop"/>
         <ImageView
             android:id="@+id/image_goods_02"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:scaleType="centerCrop"/>
         <ImageView
             android:id="@+id/image_goods_03"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:scaleType="centerCrop"/>
         <ImageView
             android:id="@+id/image_goods_04"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:scaleType="centerCrop"/>
     </LinearLayout>
 
 </LinearLayout>

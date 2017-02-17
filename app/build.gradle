@@ -26,7 +26,6 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.0.1'
     testCompile 'junit:junit:4.12'
-
     // square的内存泄漏的检测工具：https://github.com/square/leakcanary
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
@@ -40,11 +39,11 @@ dependencies {
     // butterknife
     compile 'com.jakewharton:butterknife:8.5.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
-
     // okhttp
     compile 'com.squareup.okhttp3:okhttp:3.6.0'
     compile 'com.squareup.okhttp3:logging-interceptor:3.4.2'
-
     // gson
     compile 'com.google.code.gson:gson:2.8.0'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'jp.wasabeef:picasso-transformations:2.1.0'
 }

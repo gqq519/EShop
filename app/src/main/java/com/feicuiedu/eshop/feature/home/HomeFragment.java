@@ -21,11 +21,15 @@ import com.feicuiedu.eshop.network.entity.Banner;
 import com.feicuiedu.eshop.network.entity.HomeBannerRsp;
 import com.feicuiedu.eshop.network.entity.HomeCategoryRsp;
 import com.feicuiedu.eshop.network.entity.SimpleGoods;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import jp.wasabeef.picasso.transformations.CropCircleTransformation;
+import jp.wasabeef.picasso.transformations.GrayscaleTransformation;
+import jp.wasabeef.picasso.transformations.MaskTransformation;
 
 /**
  * Created by gqq on 2017/2/13.
@@ -50,6 +54,13 @@ public class HomeFragment extends BaseFragment {
 
     private boolean mBannerRefreshed = false;
     private boolean mCategoryRefreshed = false;
+
+    private static final int[] PROMOTE_COLORS = {
+            R.color.purple,
+            R.color.orange,
+            R.color.pink,
+            R.color.colorPrimary
+    };
 
     @Override
     protected int getContentViewLayout() {
@@ -93,7 +104,8 @@ public class HomeFragment extends BaseFragment {
             @Override
             protected void bind(ViewHolder holder, final Banner data) {
                 // TODO: 2017/2/14  数据绑定,暂时是默认图
-                holder.mImageBannerItem.setImageResource(R.drawable.image_holder_banner);
+//                holder.mImageBannerItem.setImageResource(R.drawable.image_holder_banner);
+                Picasso.with(getContext()).load(data.getPicture().getLarge()).into(holder.mImageBannerItem);
             }
         };
         bannerLayout.setAdapter(mBannerAdapter);
@@ -163,7 +175,14 @@ public class HomeFragment extends BaseFragment {
             final SimpleGoods simpleGoods = list.get(i);
 
             // TODO: 2017/2/14 图片展示
-            mIvPromotes[i].setImageResource(R.drawable.image_holder_goods);
+//            mIvPromotes[i].setImageResource(R.drawable.image_holder_goods);
+            Picasso.with(getContext())
+                    .load(simpleGoods.getImg().getLarge())
+                    .transform(new CropCircleTransformation())
+                    .transform(new GrayscaleTransformation())
+                    .transform(new MaskTransformation(getContext(), PROMOTE_COLORS[i]))
+                    .into(mIvPromotes[i]);
+
 
             mIvPromotes[i].setOnClickListener(new View.OnClickListener() {
                 @Override

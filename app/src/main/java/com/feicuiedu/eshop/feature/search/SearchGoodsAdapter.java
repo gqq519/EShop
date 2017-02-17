@@ -10,7 +10,9 @@ import android.widget.TextView;
 
 import com.feicuiedu.eshop.R;
 import com.feicuiedu.eshop.base.BaseListAdapter;
+import com.feicuiedu.eshop.network.entity.Picture;
 import com.feicuiedu.eshop.network.entity.SimpleGoods;
+import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 
@@ -58,8 +60,9 @@ public class SearchGoodsAdapter extends
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             tvMarketPrice.setText(spannableString);
 
-            mItem.getImg();
-            ivGoods.setImageResource(R.drawable.image_holder_goods);
+            Picture picture = mItem.getImg();
+//            ivGoods.setImageResource(R.drawable.image_holder_goods);
+            Picasso.with(getContext()).load(picture.getLarge()).into(ivGoods);
         }
     }
 }

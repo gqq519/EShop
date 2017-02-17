@@ -10,7 +10,9 @@ import com.feicuiedu.eshop.R;
 import com.feicuiedu.eshop.base.BaseListAdapter;
 import com.feicuiedu.eshop.base.wrapper.ToastWrapper;
 import com.feicuiedu.eshop.network.entity.CategoryHome;
+import com.feicuiedu.eshop.network.entity.Picture;
 import com.feicuiedu.eshop.network.entity.SimpleGoods;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -68,8 +70,16 @@ public class HomeGoodsAdapter extends BaseListAdapter<CategoryHome, HomeGoodsAda
             List<SimpleGoods> goodsList = mItem.getHotGoodsList();
 
             for (int i = 0; i < imageViews.length; i++) {
-                goodsList.get(i).getImg();
-                imageViews[i].setImageResource(R.drawable.image_holder_goods);
+                Picture picture = goodsList.get(i).getImg();
+                Picasso.with(getContext()).load(picture.getLarge()).into(imageViews[i]);
+//                imageViews[i].setImageResource(R.drawable.image_holder_goods);
+                imageViews[i].setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // TODO: 2017/2/17 跳转到商品详情页
+                        ToastWrapper.show("到商品详情页");
+                    }
+                });
             }
         }
 

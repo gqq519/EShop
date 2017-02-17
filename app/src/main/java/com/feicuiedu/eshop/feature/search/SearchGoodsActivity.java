@@ -120,6 +120,8 @@ public class SearchGoodsActivity extends BaseActivity {
         // 设置适配器
         mGoodsAdapter = new SearchGoodsAdapter();
         mGoodsListView.setAdapter(mGoodsAdapter);
+
+        mPtrWrapper.postRefreshDelayed(50);
     }
 
     @OnClick({R.id.text_is_hot, R.id.text_most_expensive, R.id.text_cheapest})
@@ -154,7 +156,7 @@ public class SearchGoodsActivity extends BaseActivity {
         mPtrWrapper.autoRefresh();
     }
 
-    // 搜素商品
+    // 搜索商品
     private void searchGoods(final boolean isRefresh) {
 
         if (mSearchCall != null) {
