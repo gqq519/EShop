@@ -20,6 +20,8 @@ import com.feicuiedu.eshop.base.wrapper.PtrWrapper;
 import com.feicuiedu.eshop.base.wrapper.ToastWrapper;
 import com.feicuiedu.eshop.base.wrapper.ToolbarWrapper;
 import com.feicuiedu.eshop.network.EShopClient;
+import com.feicuiedu.eshop.network.api.ApiSearch;
+import com.feicuiedu.eshop.network.core.ApiPath;
 import com.feicuiedu.eshop.network.core.ResponseEntity;
 import com.feicuiedu.eshop.network.core.UiCallback;
 import com.feicuiedu.eshop.network.entity.Filter;
@@ -124,6 +126,29 @@ public class SearchGoodsActivity extends BaseActivity {
         mPtrWrapper.postRefreshDelayed(50);
     }
 
+
+    @Override
+    protected void onBusinessResponse(String apiPath, boolean success, ResponseEntity responseEntity) {
+
+        if (!ApiPath.SEARCH.equals(apiPath)){
+            throw new UnsupportedOperationException(apiPath);
+        }
+        mPtrWrapper.stopRefresh();
+        mSearchCall = null;
+        if (success) {
+
+            SearchRsp searchRsp = (SearchRsp) responseEntity;
+
+            mPaginated = searchRsp.getPaginated();
+            List<SimpleGoods> goodsList = searchRsp.getData();
+            if (mPagination.isFirst()) {
+                mGoodsAdapter.reset(goodsList);
+            } else {
+                mGoodsAdapter.addAll(goodsList);
+            }
+        }
+    }
+
     @OnClick({R.id.text_is_hot, R.id.text_most_expensive, R.id.text_cheapest})
     void chooseQueryOrder(TextView textView) {
 
@@ -169,12 +194,8 @@ public class SearchGoodsActivity extends BaseActivity {
             mPagination.next();
             LogUtils.debug("Load more, page = %s", mPagination.getPage());
         }
-
-        SearchReq req = new SearchReq();
-        req.setFilter(mFilter);
-        req.setPagination(mPagination);
-        mSearchCall = EShopClient.getInstance()
-                .enqueue("/search", req, SearchRsp.class, mUiCallback);
+        ApiSearch apiSearch = new ApiSearch(mFilter,mPagination);
+        mSearchCall = enqueue(apiSearch);
     }
 
     private UiCallback mUiCallback = new UiCallback() {

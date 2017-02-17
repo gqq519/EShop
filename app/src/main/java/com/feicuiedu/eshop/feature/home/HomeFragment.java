@@ -15,9 +15,13 @@ import com.feicuiedu.eshop.base.widgets.banner.BannerLayout;
 import com.feicuiedu.eshop.base.wrapper.PtrWrapper;
 import com.feicuiedu.eshop.base.wrapper.ToolbarWrapper;
 import com.feicuiedu.eshop.network.EShopClient;
+import com.feicuiedu.eshop.network.api.ApiHomeBanner;
+import com.feicuiedu.eshop.network.api.ApiHomeCategory;
+import com.feicuiedu.eshop.network.core.ApiPath;
 import com.feicuiedu.eshop.network.core.ResponseEntity;
 import com.feicuiedu.eshop.network.core.UiCallback;
 import com.feicuiedu.eshop.network.entity.Banner;
+import com.feicuiedu.eshop.network.entity.CategoryRsp;
 import com.feicuiedu.eshop.network.entity.HomeBannerRsp;
 import com.feicuiedu.eshop.network.entity.HomeCategoryRsp;
 import com.feicuiedu.eshop.network.entity.SimpleGoods;
@@ -81,8 +85,10 @@ public class HomeFragment extends BaseFragment {
 
                 mBannerRefreshed = false;
                 mCategoryRefreshed = false;
-                // 刷新获取数据
-                getHomeGoodsData();
+                // 刷新获取轮播数据
+                enqueue(new ApiHomeBanner());
+                // 获取首页分类数据
+                enqueue(new ApiHomeCategory());
             }
 
             @Override
@@ -129,44 +135,36 @@ public class HomeFragment extends BaseFragment {
         mListHomeGoods.addHeaderView(view);
     }
 
-    private void getHomeGoodsData() {
-
-        UiCallback categoryCb = new UiCallback() {
-            @Override
-            public void onBusinessResponse(boolean success, ResponseEntity responseEntity) {
+    // 获取到数据处理
+    @Override
+    protected void onBusinessResponse(String apiPath, boolean success, ResponseEntity responseEntity) {
+        switch (apiPath){
+            case ApiPath.HOME_DATA:
+                mBannerRefreshed = true;
+                if (success){
+                    HomeBannerRsp bannerRsp = (HomeBannerRsp) responseEntity;
+                    mBannerAdapter.reset(bannerRsp.getData().getBanners());
+                    setPromoteGoods(bannerRsp.getData().getGoodsList());
+                }
+                break;
+            case ApiPath.HOME_CATEGORY:
                 mCategoryRefreshed = true;
                 if (success) {
                     HomeCategoryRsp categoryRsp = (HomeCategoryRsp) responseEntity;
                     mGoodsAdapter.reset(categoryRsp.getData());
                 }
-                if (mBannerRefreshed && mCategoryRefreshed) {
-                    // 两个接口的数据都返回了, 才停止下拉刷新.
-                    mPtrWrapper.stopRefresh();
-                }
-            }
-        };
-        UiCallback bannerCb = new UiCallback() {
-            @Override
-            public void onBusinessResponse(boolean success, ResponseEntity responseEntity) {
-                mBannerRefreshed = true;
-                if (success) {
-                    HomeBannerRsp bannerRsp = (HomeBannerRsp) responseEntity;
-                    mBannerAdapter.reset(bannerRsp.getData().getBanners());
-                    setPromoteGoods(bannerRsp.getData().getGoodsList());
-                }
-                if (mBannerRefreshed && mCategoryRefreshed) {
-                    // 两个接口的数据都返回了, 才停止下拉刷新.
-                    mPtrWrapper.stopRefresh();
-                }
-            }
-        };
+                break;
+            default:
+                throw new UnsupportedOperationException(apiPath);
+        }
+        if (mBannerRefreshed && mCategoryRefreshed){
 
-        EShopClient.getInstance()
-                .enqueue("/home/data", null, HomeBannerRsp.class, bannerCb);
-        EShopClient.getInstance()
-                .enqueue("/home/category", null, HomeCategoryRsp.class, categoryCb);
+            // 两个接口数据都返回了，才停止刷新
+            mPtrWrapper.stopRefresh();
+        }
     }
 
+    // 设置促销商品
     private void setPromoteGoods(List<SimpleGoods> list) {
         mTvPromoteGoods.setVisibility(View.VISIBLE);
 

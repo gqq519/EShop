@@ -27,6 +27,8 @@ import com.feicuiedu.eshop.base.wrapper.ToolbarWrapper;
 import com.feicuiedu.eshop.feature.EShopMainActivity;
 import com.feicuiedu.eshop.feature.search.SearchGoodsActivity;
 import com.feicuiedu.eshop.network.EShopClient;
+import com.feicuiedu.eshop.network.api.ApiCategory;
+import com.feicuiedu.eshop.network.core.ApiPath;
 import com.feicuiedu.eshop.network.core.ResponseEntity;
 import com.feicuiedu.eshop.network.core.UiCallback;
 import com.feicuiedu.eshop.network.entity.CategoryPrimary;
@@ -107,22 +109,21 @@ public class CategoryFragment extends BaseFragment {
             updateCategory();
         } else {
             // 执行网络请求的操作
-            enqueue();
+            enqueue(new ApiCategory());
         }
     }
 
-    // 执行网络请求
-    private void enqueue() {
-        UiCallback uiCallback = new UiCallback() {
-            @Override
-            public void onBusinessResponse(boolean success, ResponseEntity responseEntity) {
-                if (success) {
-                    mData = ((CategoryRsp) responseEntity).getData();
-                    updateCategory();
-                }
-            }
-        };
-        EShopClient.getInstance().enqueue("/category", null, CategoryRsp.class, uiCallback);
+    // 拿到响应的结果
+    @Override
+    protected void onBusinessResponse(String apiPath, boolean success, ResponseEntity responseEntity) {
+        if (!ApiPath.CATEGORY.equals(apiPath)){
+            throw new  UnsupportedOperationException(apiPath);
+        }
+        if (success){
+            CategoryRsp categoryRsp = (CategoryRsp) responseEntity;
+            mData = categoryRsp.getData();
+            updateCategory();
+        }
     }
 
     // 更新分类信息

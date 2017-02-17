@@ -1,5 +1,12 @@
 package com.feicuiedu.eshop.network;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import com.feicuiedu.eshop.network.core.ApiInterface;
+import com.feicuiedu.eshop.network.core.ApiPath;
+import com.feicuiedu.eshop.network.core.RequestParam;
+import com.feicuiedu.eshop.network.core.ResponseEntity;
 import com.feicuiedu.eshop.network.entity.CategoryRsp;
 import com.feicuiedu.eshop.network.entity.HomeBannerRsp;
 import com.feicuiedu.eshop.network.entity.HomeCategoryRsp;
@@ -26,30 +33,27 @@ public class EShopClientTest {
 
     // 分类：商品分类
     @Test
-    public void getCategory() throws Exception {
-        CategoryRsp category = mClient.execute("/category",null,CategoryRsp.class);
-        // 判断状态是不是成功
-        assertTrue(category.getStatus().isSucceed());
-    }
+    public void excute() throws Exception {
+        ApiInterface apiInterface = new ApiInterface() {
+            @NonNull
+            @Override
+            public String getPath() {
+                return ApiPath.CATEGORY;
+            }
 
-    // 首页：banner
-    @Test
-    public void getBanner() throws Exception{
-        HomeBannerRsp homeBannerRsp = mClient.execute("/home/data",null,HomeBannerRsp.class);
-        assertTrue(homeBannerRsp.getStatus().isSucceed());
-    }
+            @Nullable
+            @Override
+            public RequestParam getRequestParam() {
+                return null;
+            }
 
-    // 首页：分类及数据
-    @Test
-    public void getHomeCategory() throws Exception{
-        HomeCategoryRsp homeCategoryRsp = mClient.execute("/home/category", null, HomeCategoryRsp.class);
-        assertTrue(homeCategoryRsp.getStatus().isSucceed());
-    }
-
-    @Test
-    public void getSearchGoods() throws Exception{
-        SearchReq searchReq = new SearchReq();
-        SearchRsp searchGoods = mClient.execute("/search", searchReq, SearchRsp.class);
-        assertTrue(searchGoods.getStatus().isSucceed());
+            @NonNull
+            @Override
+            public Class<? extends ResponseEntity> getResponseEntityType() {
+                return CategoryRsp.class;
+            }
+        };
+        CategoryRsp categoryRsp = mClient.execute(apiInterface);
+        assertTrue(categoryRsp.getStatus().isSucceed());
     }
 }

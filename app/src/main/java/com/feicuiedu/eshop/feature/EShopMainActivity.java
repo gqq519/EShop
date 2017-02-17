@@ -13,6 +13,7 @@ import com.feicuiedu.eshop.base.BaseActivity;
 import com.feicuiedu.eshop.base.TestFragment;
 import com.feicuiedu.eshop.feature.category.CategoryFragment;
 import com.feicuiedu.eshop.feature.home.HomeFragment;
+import com.feicuiedu.eshop.network.core.ResponseEntity;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 
@@ -59,6 +60,11 @@ public class EShopMainActivity extends BaseActivity implements OnTabSelectListen
         retrieveFragment();
         // 设置切换监听
         mBottomBar.setOnTabSelectListener(this);
+    }
+
+    @Override
+    protected void onBusinessResponse(String apiPath, boolean success, ResponseEntity responseEntity) {
+
     }
 
     @Override

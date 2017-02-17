@@ -8,6 +8,7 @@ import android.widget.ImageView;
 
 import com.feicuiedu.eshop.R;
 import com.feicuiedu.eshop.base.BaseActivity;
+import com.feicuiedu.eshop.network.core.ResponseEntity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,6 +42,11 @@ public class SplashActivity extends BaseActivity implements Animator.AnimatorLis
                 .setDuration(2000)
                 .setListener(this)
                 .start();
+    }
+
+    @Override
+    protected void onBusinessResponse(String apiPath, boolean success, ResponseEntity responseEntity) {
+
     }
 
     // 动画开始

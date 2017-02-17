@@ -1,5 +1,8 @@
 package com.feicuiedu.eshop.network;
 
+import android.os.Handler;
+
+import com.feicuiedu.eshop.network.core.ApiInterface;
 import com.feicuiedu.eshop.network.core.RequestParam;
 import com.feicuiedu.eshop.network.core.ResponseEntity;
 import com.feicuiedu.eshop.network.core.UiCallback;
@@ -72,41 +75,52 @@ public class EShopClient {
      */
 
     // 同步方法
-    public <T extends ResponseEntity>T execute(String path,
-                                               RequestParam requestParam,
-                                               Class<T> clazz) throws IOException {
+    public <T extends ResponseEntity>T execute(ApiInterface apiInterface) throws IOException {
         // 将构建的过程提取成一个方法
 
-        Response response = newApiCall(path, requestParam).execute();
-        return getResponseEntity(response,clazz);
+        Response response = newApiCall(apiInterface,null).execute();
+        Class<T> entityType = (Class<T>) apiInterface.getResponseEntityType();
+        return getResponseEntity(response,entityType);
     }
 
     // 异步方法
-    public Call enqueue(String path,
-                        RequestParam requestParam,
-                        Class<? extends ResponseEntity> clazz,
-                        UiCallback uiCallback){
+    public Call enqueue(ApiInterface apiInterface,
+                        UiCallback uiCallback,
+                        String tag){
         // 将构建的过程提取成一个方法
-        Call call = newApiCall(path, requestParam);
+        Call call = newApiCall(apiInterface,tag);
         call.enqueue(uiCallback);
-        uiCallback.setResponseType(clazz);
+        uiCallback.setResponseType(apiInterface.getResponseEntityType());
         return call;
 
     }
 
-    private Call newApiCall(String path, RequestParam requestParam) {
+    private Call newApiCall(ApiInterface apiInterface,String tag) {
         Request.Builder builder = new Request.Builder();
-        builder.url(BASE_URL + path);
+        builder.url(BASE_URL + apiInterface.getPath());
 
-        if (requestParam != null) {
-            String param = mGson.toJson(requestParam);
+        if (apiInterface.getRequestParam() != null) {
+            String param = mGson.toJson(apiInterface.getRequestParam());
             FormBody formBody = new FormBody.Builder()
                     .add("json", param)
                     .build();
             builder.post(formBody);
         }
+        builder.tag(tag);
         Request request = builder.build();
         return mOkHttpClient.newCall(request);
     }
 
+    public void cancleByTag(String tag){
+        // 取消的时候，多个call在队列中顺序执行，首先关闭队伍中的，再关闭正在执行的
+        for (Call call:mOkHttpClient.dispatcher().queuedCalls()){
+            if (call.request().tag().equals(tag))
+                call.cancel();
+        }
+
+        for (Call call:mOkHttpClient.dispatcher().runningCalls()){
+            if (call.request().tag().equals(tag))
+                call.cancel();
+        }
+    }
 }
