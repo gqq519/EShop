@@ -19,6 +19,7 @@ import com.feicuiedu.eshop.base.widgets.loadmore.LoadMoreFooter;
 import com.feicuiedu.eshop.base.wrapper.PtrWrapper;
 import com.feicuiedu.eshop.base.wrapper.ToastWrapper;
 import com.feicuiedu.eshop.base.wrapper.ToolbarWrapper;
+import com.feicuiedu.eshop.feature.goods.GoodsActivity;
 import com.feicuiedu.eshop.network.EShopClient;
 import com.feicuiedu.eshop.network.api.ApiSearch;
 import com.feicuiedu.eshop.network.core.ApiPath;
@@ -38,6 +39,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.OnClick;
+import butterknife.OnItemClick;
 import in.srain.cube.views.ptr.PtrFrameLayout;
 import okhttp3.Call;
 
@@ -124,6 +126,12 @@ public class SearchGoodsActivity extends BaseActivity {
         mGoodsListView.setAdapter(mGoodsAdapter);
 
         mPtrWrapper.postRefreshDelayed(50);
+    }
+
+    @OnItemClick(R.id.list_goods)
+    public void itemGoodsClick(int position){
+        Intent startIntent = GoodsActivity.getStartIntent(this, mGoodsAdapter.getItem(position).getId());
+        startActivity(startIntent);
     }
 
 

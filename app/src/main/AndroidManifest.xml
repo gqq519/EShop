@@ -22,6 +22,8 @@
         </activity>
         <activity android:name=".feature.search.SearchGoodsActivity">
         </activity>
+        <activity android:name=".feature.goods.GoodsActivity">
+        </activity>
     </application>
 
 </manifest>

@@ -1,5 +1,6 @@
 package com.feicuiedu.eshop.feature.home;
 
+import android.content.Intent;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import com.feicuiedu.eshop.base.widgets.banner.BannerAdapter;
 import com.feicuiedu.eshop.base.widgets.banner.BannerLayout;
 import com.feicuiedu.eshop.base.wrapper.PtrWrapper;
 import com.feicuiedu.eshop.base.wrapper.ToolbarWrapper;
+import com.feicuiedu.eshop.feature.goods.GoodsActivity;
 import com.feicuiedu.eshop.network.EShopClient;
 import com.feicuiedu.eshop.network.api.ApiHomeBanner;
 import com.feicuiedu.eshop.network.api.ApiHomeCategory;
@@ -185,7 +187,9 @@ public class HomeFragment extends BaseFragment {
             mIvPromotes[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(getContext(), simpleGoods.getName(), Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getContext(), simpleGoods.getName(), Toast.LENGTH_SHORT).show();
+                    Intent intent = GoodsActivity.getStartIntent(getContext(), simpleGoods.getId());
+                    startActivity(intent);
                 }
             });
         }

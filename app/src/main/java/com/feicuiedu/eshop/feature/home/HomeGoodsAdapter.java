@@ -1,6 +1,7 @@
 package com.feicuiedu.eshop.feature.home;
 
 
+import android.content.Intent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -9,6 +10,7 @@ import android.widget.Toast;
 import com.feicuiedu.eshop.R;
 import com.feicuiedu.eshop.base.BaseListAdapter;
 import com.feicuiedu.eshop.base.wrapper.ToastWrapper;
+import com.feicuiedu.eshop.feature.goods.GoodsActivity;
 import com.feicuiedu.eshop.network.entity.CategoryHome;
 import com.feicuiedu.eshop.network.entity.Picture;
 import com.feicuiedu.eshop.network.entity.SimpleGoods;
@@ -64,10 +66,10 @@ public class HomeGoodsAdapter extends BaseListAdapter<CategoryHome, HomeGoodsAda
         }
 
         @Override
-        protected void bind(int position) {
+        protected void bind(final int position) {
             mItem = getItem(position);
             tvCategory.setText(mItem.getName());
-            List<SimpleGoods> goodsList = mItem.getHotGoodsList();
+            final List<SimpleGoods> goodsList = mItem.getHotGoodsList();
 
             for (int i = 0; i < imageViews.length; i++) {
                 Picture picture = goodsList.get(i).getImg();
@@ -76,8 +78,10 @@ public class HomeGoodsAdapter extends BaseListAdapter<CategoryHome, HomeGoodsAda
                 imageViews[i].setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // TODO: 2017/2/17 跳转到商品详情页
-                        ToastWrapper.show("到商品详情页");
+//                        ToastWrapper.show("到商品详情页");
+                        Intent intent = GoodsActivity.getStartIntent(getContext(), goodsList.get(position).getId());
+                        getContext().startActivity(intent);
+
                     }
                 });
             }
